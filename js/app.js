@@ -23,7 +23,7 @@ const productsArray = [
   new Product('All-in-one Breakfast Maker', 'breakfast'),
   new Product('Meatball Bubble Gum', 'bubblegum'),
   new Product('Camel Chair', 'chair'),
-  new Product('Cthulu Figuring', 'cthulu'),
+  new Product('Cthulu Figurine', 'cthulu'),
   new Product('Doggy Duck Bill', 'dog-duck'),
   new Product('Dragon Mean', 'dragon'),
   new Product('Pen Utensils', 'pen'),
@@ -37,8 +37,26 @@ const productsArray = [
   new Product('EZ Tip Wine Glass', 'wine-glass'),
 ];
 
+// Inclusive minimum, exclusive maximum. Algorithm from MDN Docs.
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min);
+}
+
+function pickRandomUniques(array, numToPick) {
+  array = array.slice();
+  const picksArray = [];
+  for (let i = 0; i < numToPick; i++) {
+    const randomIndex = getRandomInt(0, array.length);
+    picksArray.push(array[randomIndex]);
+    array.splice(randomIndex, 1);
+  }
+  return picksArray;
+}
+
 cache.votingButtonSection.addEventListener('click', (e) => {
   console.log(e.target);
-  console.log(productsArray[1]);
+  console.log(pickRandomUniques(productsArray, 3));
 });
 
