@@ -57,13 +57,14 @@ function pickRandomUniques(choicesArray, numToPick) {
 
 function drawButton(buttonElement, productObject) {
   buttonElement.innerHTML = '';
+  buttonElement.id = productObject.fileName;
   const img = document.createElement('img');
   img.src = `img/${productObject.path}`;
   img.alt = `${productObject.productName}`;
   img.classList.add('product-image');
   img.width = '300';
+  img.style.pointerEvents = 'none';
   buttonElement.append(img);
-  console.log(buttonElement)
 }
 
 function refreshVotingChoices(choicesArray) {
@@ -72,13 +73,18 @@ function refreshVotingChoices(choicesArray) {
   for (let i = 0; i < votingButtons.length; i++) {
     drawButton(votingButtons[i], newChoices[i]);
   }
-  
 }
 
-cache.votingButtonSection.addEventListener('click', (e) => {
-  refreshVotingChoices(productsArray)
-  
+cache.votingButtonSection.addEventListener('click', function (e) {
+  const chosenProduct = productsArray.find(product => {
+    return product.fileName === e.target.id;
+  });
+  chosenProduct.votes++
+  console.log(chosenProduct)
+  refreshVotingChoices(productsArray);
 });
+
+refreshVotingChoices(productsArray);
 
 
 
