@@ -49,6 +49,7 @@ function pickRandomUniques(choicesArray, numToPick) {
   const picksArray = [];
   for (let i = 0; i < numToPick; i++) {
     const randomIndex = getRandomInt(0, array.length);
+    array[randomIndex].views++;
     picksArray.push(array[randomIndex]);
     array.splice(randomIndex, 1);
   }
@@ -79,8 +80,8 @@ cache.votingButtonSection.addEventListener('click', function (e) {
   const chosenProduct = productsArray.find(product => {
     return product.fileName === e.target.id;
   });
-  chosenProduct.votes++
-  console.log(chosenProduct)
+  chosenProduct.votes++;
+  console.log(chosenProduct);
   refreshVotingChoices(productsArray);
 });
 
