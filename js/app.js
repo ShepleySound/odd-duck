@@ -23,7 +23,7 @@ const productsArray = [
   new Product('All-in-one Breakfast Maker', 'breakfast'),
   new Product('Meatball Bubble Gum', 'bubblegum'),
   new Product('Camel Chair', 'chair'),
-  new Product('Cthulu Figurine', 'cthulu'),
+  new Product('Cthulu Figurine', 'cthulhu'),
   new Product('Doggy Duck Bill', 'dog-duck'),
   new Product('Dragon Mean', 'dragon'),
   new Product('Pen Utensils', 'pen'),
@@ -44,8 +44,8 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-function pickRandomUniques(array, numToPick) {
-  array = array.slice();
+function pickRandomUniques(choicesArray, numToPick) {
+  const array = choicesArray.slice();
   const picksArray = [];
   for (let i = 0; i < numToPick; i++) {
     const randomIndex = getRandomInt(0, array.length);
@@ -55,8 +55,30 @@ function pickRandomUniques(array, numToPick) {
   return picksArray;
 }
 
+function drawButton(buttonElement, productObject) {
+  buttonElement.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = `img/${productObject.path}`;
+  img.alt = `${productObject.productName}`;
+  img.classList.add('product-image');
+  img.width = '300';
+  buttonElement.append(img);
+  console.log(buttonElement)
+}
+
+function refreshVotingChoices(choicesArray) {
+  const votingButtons = cache.votingButtonSection.children;
+  const newChoices = pickRandomUniques(choicesArray, votingButtons.length);
+  for (let i = 0; i < votingButtons.length; i++) {
+    drawButton(votingButtons[i], newChoices[i]);
+  }
+  
+}
+
 cache.votingButtonSection.addEventListener('click', (e) => {
-  console.log(e.target);
-  console.log(pickRandomUniques(productsArray, 3));
+  refreshVotingChoices(productsArray)
+  
 });
+
+
 
