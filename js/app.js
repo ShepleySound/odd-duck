@@ -6,10 +6,11 @@ const cache = {
   roundCount: document.querySelector('.round-count'),
   resultsOverlay: document.querySelector('.results-overlay'),
   resultsList: document.querySelector('.results-list'),
+  resultsChart: document.querySelector('results-chart')
 };
 
 const votingState = {
-  endAfterRound: 25,
+  endAfterRound: 3,
   round: 1,
   incrementRound() {
     this.round++;
@@ -38,6 +39,9 @@ Product.previousSet = [];
 Product.inUseSet = [];
 
 Product.prototype.getPercent = function() {
+  if (this.views === 0) {
+    return 0;
+  }
   return this.votes / this.views;
 };
 
@@ -75,7 +79,7 @@ Product.pickRandomUniques = function(numToPick) {
     const randomIndex = getRandomInt(0, Product.instances.length);
     const randomProduct = Product.instances[randomIndex];
     if (Product.inUseSet.includes(randomProduct)) {
-      console.log("Duplicate attempted. Retrying...")
+      console.log('Duplicate attempted. Retrying...');
     }
     if (!Product.inUseSet.includes(randomProduct)) {
       successes++;
