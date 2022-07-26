@@ -34,6 +34,8 @@ function Product(productName, fileName, extension = 'jpg') {
   Product.instances.push(this);
 }
 Product.instances = [];
+Product.previousSet = [];
+Product.inUseSet = [];
 
 Product.prototype.getPercent = function() {
   return this.votes / this.views;
@@ -66,18 +68,24 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-function pickRandomUniques(choicesArray, numToPick) {
-  const array = choicesArray.slice();
-  const picksArray = [];
-  for (let i = 0; i < numToPick; i++) {
-    const randomIndex = getRandomInt(0, array.length);
-    const randomProduct = array[randomIndex];
-    randomProduct.views++;
-    picksArray.push(randomProduct);
-    array.splice(randomIndex, 1);
+Product.pickRandomUniques = function(numToPick) {
+  let successes = 0;
+  // Handles getting items unique to the current set AND previous set.
+  while (successes < numToPick) {
+    const randomIndex = getRandomInt(0, Product.instances.length);
+    const randomProduct = Product.instances[randomIndex];
+    if (Product.inUseSet.includes(randomProduct)) {
+      console.log("Duplicate attempted. Retrying...")
+    }
+    if (!Product.inUseSet.includes(randomProduct)) {
+      successes++;
+      randomProduct.views++;
+      Product.inUseSet.unshift(randomProduct);
+    }
   }
-  return picksArray;
-}
+  Product.inUseSet.splice(numToPick);
+  return Product.inUseSet;
+};
 
 // Draws an image to a buttonElement using given productObject properties.
 function drawButton(buttonElement, productObject) {
@@ -94,9 +102,9 @@ function drawButton(buttonElement, productObject) {
 }
 
 // Creates new voting choices for user.
-function refreshVotingChoices(choicesArray) {
+function refreshVotingChoices() {
   const votingButtons = cache.votingButtonSection.children;
-  const newChoices = pickRandomUniques(choicesArray, votingButtons.length);
+  const newChoices = Product.pickRandomUniques(votingButtons.length);
   for (let i = 0; i < votingButtons.length; i++) {
     drawButton(votingButtons[i], newChoices[i]);
   }
