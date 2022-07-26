@@ -9,7 +9,7 @@ const cache = {
 };
 
 const votingState = {
-  endAfterRound: 1,
+  endAfterRound: 25,
   round: 1,
   incrementRound() {
     this.round++;
