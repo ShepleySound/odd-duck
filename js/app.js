@@ -115,6 +115,7 @@ function populateResults() {
     item.innerText = `${product.fileName}: ${product.votes} / ${product.views}`;
     cache.resultsList.append(item);
   });
+  cache.resultsOverlay.classList.add('visible');
 }
 
 function handleVoteSelection(event) {
