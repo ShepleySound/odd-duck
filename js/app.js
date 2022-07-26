@@ -2,11 +2,26 @@
 
 const cache = {
   votingButtonSection: document.querySelector('.voting-buttons'),
-  showResultsBtn: document.querySelector('.show-results-button')
+  showResultsBtn: document.querySelector('.show-results-button'),
+  roundCount: document.querySelector('.round-count'),
+  resultsOverlay: document.querySelector('.results-overlay'),
+  resultsList: document.querySelector('.results-list'),
 };
 
-const roundsBeforeDisplay = 25;
-let roundCount = 0;
+const votingState = {
+  endAfterRound: 1,
+  round: 1,
+  incrementRound() {
+    this.round++;
+  },
+  isResultDisplayable() {
+    if (this.round >= this.endAfterRound) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
 
 // Constructs a new Product given a name, filepath, and file extension.
 function Product(productName, fileName, extension = 'jpg') {
@@ -81,16 +96,50 @@ function refreshVotingChoices(choicesArray) {
   }
 }
 
-cache.votingButtonSection.addEventListener('click', function (e) {
-  const chosenProduct = Product.instances.find(product => {
-    return product.fileName === e.target.id;
+function handleVotingEnd() {
+  if (votingState.isResultDisplayable()) {
+    cache.showResultsBtn.style.opacity = 100;
+    cache.votingButtonSection.removeEventListener('click', handleVoteSelection);
+    const votingButtons = cache.votingButtonSection.children;
+    for (let i = 0; i < votingButtons.length; i++) {
+      votingButtons[i].classList.add('disabled');
+    }
+  }
+}
+
+function populateResults() {
+  cache.resultsList.innerHTML = '';
+
+  Product.instances.forEach(product => {
+    const item = document.createElement('li');
+    item.innerText = `${product.fileName}: ${product.votes} / ${product.views}`;
+    cache.resultsList.append(item);
   });
+}
+
+function handleVoteSelection(event) {
+  const chosenProduct = Product.instances.find(product => {
+    return product.fileName === event.target.id;
+  });
+
+  if (!chosenProduct) {
+    return;
+  }
+
   chosenProduct.votes++;
-  roundCount++;
-  refreshVotingChoices(Product.instances);
-});
+  if (!votingState.isResultDisplayable()) {
+    refreshVotingChoices(Product.instances);
+    votingState.incrementRound();
+    cache.roundCount.innerText = `Round: ${votingState.round}`;
+  } else {
+    handleVotingEnd();
+    cache.roundCount.innerText = 'Voting Over';
+  }
+}
 
+cache.votingButtonSection.addEventListener('click', handleVoteSelection);
+
+cache.showResultsBtn.addEventListener('click', populateResults);
+cache.showResultsBtn.style.opacity = 0;
+cache.roundCount.innerText = `Round: ${votingState.round}`;
 refreshVotingChoices(Product.instances);
-
-
-

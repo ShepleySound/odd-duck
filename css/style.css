@@ -4,16 +4,29 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #242424;
+  background-color: #404e4b;
   color: #cccccc;
 }
 
 header {
   height: 60px;
-  padding: 30px
+  padding: 30px;
+  display: flex;
+  text-align: center;
 }
 
+.header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
 header h1 {
+  font-size: 2.5rem;
+}
+
+header h2 {
   font-size: 2rem;
 }
 
@@ -21,6 +34,11 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100%;
+}
+
+.round-count {
+  font-size: 1.5rem;
 }
 
 section.voting-buttons {
@@ -28,18 +46,45 @@ section.voting-buttons {
   flex-wrap: wrap
 }
 
+.button {
+  padding: 20px;
+  border: none;
+  border-radius: 10px;
+  color: #cccccc;
+}
+
 .product-button {
   margin: 20px;
   padding: 20px;
-  background-color: #cccccc;
-  border: none;
-  border-radius: 10px;
+  background-color: #70837e;
+  transition: background-color 250ms, opacity 250ms;
+}
+
+.product-button:hover {
+  background-color: #4e6f77;
+}
+
+.product-button.disabled {
+  opacity: 50%;
+  pointer-events: none;
 }
 
 .product-image {
   height: 300px;
   width: 300px;
   border-radius: 10px;
+}
+
+.show-results-button {
+  background-color: #92744d;
+  font-size: 1.5em;
+  opacity: 0;
+  transition: background-color 250ms, opacity 250ms;
+  margin: 30px;
+}
+
+.show-results-button:hover {
+  background-color: #497579;
 }
 
 footer {

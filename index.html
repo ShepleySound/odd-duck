@@ -10,22 +10,30 @@
 </head>
 <body>
   <header>
-    <h1>Odd Duck Voting Service</h1>
+    <div class="header-center">
+      <h1>Odd Duck</h1>
+      <h2>Product Preference Survey</h2>
+    </div>
   </header>
   <main>
     <div class="round-count"></div>
     <section class="voting-buttons">
-      <button class="product-button">
+      <button class="button product-button">
         <img src="" alt="" class="product-image" width="300">
       </button>
-      <button class="product-button">
+      <button class="button product-button">
         <img src="" alt="" class="product-image" width="300">
       </button>
-      <button class="product-button">
+      <button class="button product-button">
         <img src="" alt="" class="product-image" width="300">
       </button>
     </section>
-    <button class="show-results-button">Show Results</button>
+    <button class="button show-results-button">Show Results</button>
+    <section class="results-overlay">
+      <h2>Results</h2>
+      <h3>Product: votes / views</h3>
+      <ul class="results-list"></ul>
+    </section>
   </main>
   <footer>Web Development Project by Robert Shepley &copy; 2022</footer>
 </body>
