@@ -35,6 +35,10 @@ function Product(productName, fileName, extension = 'jpg') {
 }
 Product.instances = [];
 
+Product.prototype.getPercent = function() {
+  return this.votes / this.views;
+};
+
 new Product('R2D2 Luggage', 'bag');
 new Product('Banana Slicer', 'banana');
 new Product('Bathroom Tablet Stand', 'bathroom');
@@ -75,6 +79,7 @@ function pickRandomUniques(choicesArray, numToPick) {
   return picksArray;
 }
 
+// Draws an image to a buttonElement using given productObject properties.
 function drawButton(buttonElement, productObject) {
   buttonElement.innerHTML = '';
   buttonElement.id = productObject.fileName;
@@ -88,6 +93,7 @@ function drawButton(buttonElement, productObject) {
   buttonElement.append(img);
 }
 
+// Creates new voting choices for user.
 function refreshVotingChoices(choicesArray) {
   const votingButtons = cache.votingButtonSection.children;
   const newChoices = pickRandomUniques(choicesArray, votingButtons.length);
@@ -107,12 +113,13 @@ function handleVotingEnd() {
   }
 }
 
+// Clears result list and pushes session results to the page.
 function populateResults() {
   cache.resultsList.innerHTML = '';
 
   Product.instances.forEach(product => {
     const item = document.createElement('li');
-    item.innerText = `${product.fileName}: ${product.votes} / ${product.views}`;
+    item.innerText = `${product.fileName}: ${product.votes} / ${product.views} (${Math.round(product.getPercent() * 100)}%)`;
     cache.resultsList.append(item);
   });
   cache.resultsOverlay.classList.add('visible');

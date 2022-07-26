@@ -43,7 +43,9 @@ main {
 
 section.voting-buttons {
   display: flex;
-  flex-wrap: wrap
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .button {
@@ -54,6 +56,9 @@ section.voting-buttons {
 }
 
 .product-button {
+  /* box-sizing: border-box; */
+  width: 440px;
+  height: 440px;
   margin: 20px;
   padding: 20px;
   background-color: #70837e;
@@ -70,9 +75,12 @@ section.voting-buttons {
 }
 
 .product-image {
-  height: 300px;
-  width: 300px;
+  width: auto;
+  height: auto;
+  max-height: 400px;
+  max-width: 400px;
   border-radius: 10px;
+  object-fit: contain;
 }
 
 .show-results-button {
@@ -91,6 +99,10 @@ section.voting-buttons {
   font-size: 2.5rem;
 }
 
+.results-overlay h3 {
+  font-size: 1rem;
+}
+
 .results-overlay {
   position: absolute;
   top: 0;
@@ -99,7 +111,10 @@ section.voting-buttons {
   font-size: 2rem;
   display: none;
   background-color: #121212dd;
+}
 
+.results-list>* {
+  margin: .5em;
 }
 
 .results-overlay.visible {
