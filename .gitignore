@@ -1,0 +1,8 @@
+# Logs
+Logs
+*.log
+
+# Optional eslint cache
+.eslintcache
+
+!.gitignore

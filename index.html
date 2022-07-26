@@ -3,9 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Item Votes</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/app.js" defer></script>
+  <title>Odd Duck</title>
 </head>
 <body>
-  
+  <header>
+    <div class="header-center">
+      <h1>Odd Duck</h1>
+      <h2>Product Preference Survey</h2>
+    </div>
+  </header>
+  <main>
+    <div class="round-count"></div>
+    <section class="voting-buttons">
+      <button class="button product-button">
+        <img src="" alt="" class="product-image" width="400">
+      </button>
+      <button class="button product-button">
+        <img src="" alt="" class="product-image" width="400">
+      </button>
+      <button class="button product-button">
+        <img src="" alt="" class="product-image" width="400">
+      </button>
+    </section>
+    <button class="button show-results-button">Show Results</button>
+    <section class="results-overlay">
+      <h2>Results</h2>
+      <h3>Product: votes / views (%)</h3>
+      <ul class="results-list"></ul>
+    </section>
+  </main>
+  <footer>Web Development Project by Robert Shepley &copy; 2022</footer>
 </body>
 </html>
