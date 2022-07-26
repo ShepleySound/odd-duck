@@ -104,6 +104,7 @@ function refreshVotingChoices(choicesArray) {
 
 function handleVotingEnd() {
   if (votingState.isResultDisplayable()) {
+    cache.showResultsBtn.style.display = 'block';
     cache.showResultsBtn.style.opacity = 100;
     cache.votingButtonSection.removeEventListener('click', handleVoteSelection);
     const votingButtons = cache.votingButtonSection.children;
@@ -115,14 +116,16 @@ function handleVotingEnd() {
 
 // Clears result list and pushes session results to the page.
 function populateResults() {
-  cache.resultsList.innerHTML = '';
+  if (votingState.isResultDisplayable) {
+    cache.resultsList.innerHTML = '';
 
-  Product.instances.forEach(product => {
-    const item = document.createElement('li');
-    item.innerText = `${product.fileName}: ${product.votes} / ${product.views} (${Math.round(product.getPercent() * 100)}%)`;
-    cache.resultsList.append(item);
-  });
-  cache.resultsOverlay.classList.add('visible');
+    Product.instances.forEach(product => {
+      const item = document.createElement('li');
+      item.innerText = `${product.fileName}: ${product.votes} / ${product.views} (${Math.round(product.getPercent() * 100)}%)`;
+      cache.resultsList.append(item);
+    });
+    cache.resultsOverlay.classList.add('visible');
+  }
 }
 
 function handleVoteSelection(event) {
@@ -148,6 +151,7 @@ function handleVoteSelection(event) {
 cache.votingButtonSection.addEventListener('click', handleVoteSelection);
 
 cache.showResultsBtn.addEventListener('click', populateResults);
+cache.showResultsBtn.style.display = 'none';
 cache.showResultsBtn.style.opacity = 0;
 cache.roundCount.innerText = `Round: ${votingState.round}`;
 refreshVotingChoices(Product.instances);
