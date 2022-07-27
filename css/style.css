@@ -20,6 +20,14 @@ a {
   text-decoration: none;
 }
 
+.button {
+  padding: 20px;
+  border: none;
+  border-radius: 10px;
+  color: #cccccc;
+  user-select: none;
+}
+
 header {
   padding: 30px;
   display: flex;
@@ -35,11 +43,6 @@ header {
   align-items: center;
 }
 
-.empty-spacer {
-  width: 150px;
-  height: 100%;
-}
-
 header h1 {
   font-size: 25px;
   font-family: 'Cinzel Decorative', cursive;
@@ -49,6 +52,31 @@ header h1 {
 header h2 {
   font-size: 2rem;
   text-align: center;
+}
+
+.info-button-container {
+  width: 150px;
+  height: 100%;
+}
+
+.info-button {
+  background-color: #12121218;
+  color: #cccccccc;
+  font-size: 30px;
+  border-radius: 100%;
+  width: 50px;
+  height: 50px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  transition: background-color 250ms, color 250ms;
+}
+
+.info-button:hover {
+  background-color: #12121236;
+  color: #cccccc
 }
 
 main {
@@ -70,14 +98,6 @@ main {
   justify-content: center;
   flex-wrap: wrap;
   opacity: 80%;
-}
-
-.button {
-  padding: 20px;
-  border: none;
-  border-radius: 10px;
-  color: #cccccc;
-  user-select: none;
 }
 
 .product-button {
@@ -157,7 +177,7 @@ main {
 .results-list {
   padding: 20px;
   display: grid;
-  grid-template-columns: max-content
+  grid-template-columns: max-content;
 }
 
 .results-list>* {
@@ -220,7 +240,7 @@ footer {
     display: none;
   }
 
-  .empty-spacer {
+  .info-button-container {
     width: 50px;
   }
 }
