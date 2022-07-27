@@ -1,5 +1,4 @@
 'use strict';
-
 const cache = {
   votingButtonSection: document.querySelector('.voting-buttons'),
   showResultsBtn: document.querySelector('.show-results-button'),
@@ -137,9 +136,37 @@ function populateResults() {
       cache.resultsList.append(item);
     });
     cache.resultsOverlay.classList.add('visible');
+    buildBarChart();
   }
+}
+
+function handleVoteSelection(event) {
+  const chosenProduct = Product.instances.find(product => {
+    return product.fileName === event.target.id;
+  });
+
+  if (!chosenProduct) {
+    return;
+  }
+
+  chosenProduct.votes++;
+  if (!votingState.isResultDisplayable()) {
+    refreshVotingChoices(Product.instances);
+    votingState.incrementRound();
+    cache.roundCount.innerText = `Round: ${votingState.round}`;
+  } else {
+    handleVotingEnd();
+    cache.roundCount.innerText = 'Voting Over';
+  }
+}
+
+function buildBarChart() {
+  // eslint-disable-next-line no-undef
   Chart.defaults.color = '#cccccc';
-  Chart.defaults.font.size = 14
+  // eslint-disable-next-line no-undef
+  Chart.defaults.font.family = '"Roboto Mono", monospace',
+  Chart.defaults.font.size = 14;
+  // eslint-disable-next-line no-undef
   new Chart(cache.resultsChartCanvas, {
     type: 'bar',
     data: {
@@ -195,25 +222,6 @@ function populateResults() {
   });
 }
 
-function handleVoteSelection(event) {
-  const chosenProduct = Product.instances.find(product => {
-    return product.fileName === event.target.id;
-  });
-
-  if (!chosenProduct) {
-    return;
-  }
-
-  chosenProduct.votes++;
-  if (!votingState.isResultDisplayable()) {
-    refreshVotingChoices(Product.instances);
-    votingState.incrementRound();
-    cache.roundCount.innerText = `Round: ${votingState.round}`;
-  } else {
-    handleVotingEnd();
-    cache.roundCount.innerText = 'Voting Over';
-  }
-}
 
 
 cache.votingButtonSection.addEventListener('click', handleVoteSelection);

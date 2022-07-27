@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Montserrat:wght@400;500;600&family=Noto+Serif:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.2/dist/chart.min.js" defer></script>
-  <script src="js/app.js" defer></script>
+  <script src="js/app.js" type="module" defer></script>
   <title>Odd Duck</title>
 </head>
 <body>
   <header>
-    <div class="header-center">
-      <h1>Odd Duck</h1>
-      <h2>Product Preference Survey</h2>
-    </div>
+    <a class="company-logo" href="">
+      <img src="img/duck-svg.svg" alt="Duck Logo" width="50">
+      <h1>Odd<br>Duck</h1>
+    </a>
+    <h2>Product Preference Survey</h2>
+    <div class="empty-spacer"></div>
   </header>
   <main>
     <div class="round-count"></div>
@@ -33,13 +38,15 @@
 
   </main>
   <footer>Web Development Project by Robert Shepley &copy; 2022</footer>
-      <section class="results-overlay hidden">
-      <h2>Results</h2>
-      <h3>Product: votes / views (%)</h3>
-      <ul class="results-list"></ul>
+      <div class="results-overlay hidden">
+      <section class="results-list-area">
+        <h2>Results</h2>
+        <h3>Product: votes / views (%)</h3>
+        <ul class="results-list"></ul>
+      </section>
       <div class="results-chart-area">
         <canvas class="results-chart"></canvas>
       </div>
-    </section>
+    </div>
 </body>
 </html>
