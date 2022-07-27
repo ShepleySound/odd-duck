@@ -1,11 +1,11 @@
 'use strict';
-
 const cache = {
   votingButtonSection: document.querySelector('.voting-buttons'),
   showResultsBtn: document.querySelector('.show-results-button'),
   roundCount: document.querySelector('.round-count'),
   resultsOverlay: document.querySelector('.results-overlay'),
   resultsList: document.querySelector('.results-list'),
+  resultsChartCanvas: document.querySelector('.results-chart').getContext('2d'),
 };
 
 const votingState = {
@@ -34,8 +34,12 @@ function Product(productName, fileName, extension = 'jpg') {
   Product.instances.push(this);
 }
 Product.instances = [];
+Product.inUseSet = [];
 
 Product.prototype.getPercent = function() {
+  if (this.views === 0) {
+    return 0;
+  }
   return this.votes / this.views;
 };
 
@@ -66,18 +70,24 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-function pickRandomUniques(choicesArray, numToPick) {
-  const array = choicesArray.slice();
-  const picksArray = [];
-  for (let i = 0; i < numToPick; i++) {
-    const randomIndex = getRandomInt(0, array.length);
-    const randomProduct = array[randomIndex];
-    randomProduct.views++;
-    picksArray.push(randomProduct);
-    array.splice(randomIndex, 1);
+Product.pickRandomUniques = function(numToPick) {
+  let successes = 0;
+  // Handles getting items unique to the current set AND previous set.
+  while (successes < numToPick) {
+    const randomIndex = getRandomInt(0, Product.instances.length);
+    const randomProduct = Product.instances[randomIndex];
+    if (Product.inUseSet.includes(randomProduct)) {
+      console.log('Duplicate attempted. Retrying...');
+    }
+    if (!Product.inUseSet.includes(randomProduct)) {
+      successes++;
+      randomProduct.views++;
+      Product.inUseSet.unshift(randomProduct);
+    }
   }
-  return picksArray;
-}
+  Product.inUseSet.splice(numToPick);
+  return Product.inUseSet;
+};
 
 // Draws an image to a buttonElement using given productObject properties.
 function drawButton(buttonElement, productObject) {
@@ -94,9 +104,9 @@ function drawButton(buttonElement, productObject) {
 }
 
 // Creates new voting choices for user.
-function refreshVotingChoices(choicesArray) {
+function refreshVotingChoices() {
   const votingButtons = cache.votingButtonSection.children;
-  const newChoices = pickRandomUniques(choicesArray, votingButtons.length);
+  const newChoices = Product.pickRandomUniques(votingButtons.length);
   for (let i = 0; i < votingButtons.length; i++) {
     drawButton(votingButtons[i], newChoices[i]);
   }
@@ -118,6 +128,7 @@ function handleVotingEnd() {
 function populateResults() {
   if (votingState.isResultDisplayable) {
     cache.resultsList.innerHTML = '';
+    cache.votingButtonSection.classList.add('hidden');
 
     Product.instances.forEach(product => {
       const item = document.createElement('li');
@@ -125,6 +136,7 @@ function populateResults() {
       cache.resultsList.append(item);
     });
     cache.resultsOverlay.classList.add('visible');
+    buildBarChart();
   }
 }
 
@@ -147,6 +159,70 @@ function handleVoteSelection(event) {
     cache.roundCount.innerText = 'Voting Over';
   }
 }
+
+function buildBarChart() {
+  // eslint-disable-next-line no-undef
+  Chart.defaults.color = '#cccccc';
+  // eslint-disable-next-line no-undef
+  Chart.defaults.font.family = '"Roboto Mono", monospace',
+  Chart.defaults.font.size = 14;
+  // eslint-disable-next-line no-undef
+  new Chart(cache.resultsChartCanvas, {
+    type: 'bar',
+    data: {
+      labels: Product.instances.map(product => product.fileName),
+      datasets: [{
+        label: '# of Views',
+        data: Product.instances.map(product => product.views),
+        backgroundColor: [
+          '#CACFB53f',
+          '#9FA9933f',
+          '#9DA9A13f',
+          '#BDB2A83f',
+          '#906A653f',
+        ],
+        borderWidth: 1
+      },
+      {
+        label: '# of Votes',
+        data: Product.instances.map(product => product.votes),
+        backgroundColor: [
+          '#D9E59D',
+          '#A2BD81',
+          '#94B49D',
+          '#D0B194',
+          '#B84D3F',
+        ],
+        borderColor: [
+          '#121212'
+        ],
+        borderWidth: 1
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          stacked: true,
+          ticks: {
+            font: {
+              size: 14
+            },
+            maxRotation: 90
+          }
+        },
+        y: {
+          ticks: {
+            precision: 0
+          },
+          stacked: false
+        }
+      }
+    },
+  });
+}
+
+
 
 cache.votingButtonSection.addEventListener('click', handleVoteSelection);
 
