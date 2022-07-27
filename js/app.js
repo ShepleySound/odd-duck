@@ -29,11 +29,11 @@ const votingState = {
 };
 
 // Constructs a new Product given a name, filepath, and file extension.
-function Product(productName, fileName, extension = 'jpg', votes = 0, views = 0) {
-  this.productName = productName;
+function Product(fileName, extension = 'jpg', votes = 0, views = 0) {
   this.fileName = fileName;
   this.extension = extension;
   this.path = `${this.fileName}.${this.extension}`;
+  this.productName = capitalizeWords(this.fileName);
   this.votes = votes;
   this.views = views;
   Product.instances.push(this);
@@ -52,11 +52,11 @@ Product.pullFromStorage = function() {
     storedProducts.forEach(rawProduct => {
       Product.createFromRawObject(rawProduct)
     });
-  }
+  } else {Product.instantiateProducts()}
 };
 
 Product.createFromRawObject = function(object) {
-  return new Product(object.productName, object.fileName, object.extension, object.votes, object.views);
+  return new Product(object.fileName, object.extension, object.votes, object.views);
 };
 
 Product.prototype.getPercent = function() {
@@ -66,34 +66,27 @@ Product.prototype.getPercent = function() {
   return this.votes / this.views;
 };
 
-function instantiateProducts() {
-  new Product('R2D2 Luggage', 'bag');
-  new Product('Banana Slicer', 'banana');
-  new Product('Bathroom Tablet Stand', 'bathroom');
-  new Product('Toeless Rain Boots', 'boots');
-  new Product('All-in-one Breakfast Maker', 'breakfast');
-  new Product('Meatball Bubble Gum', 'bubblegum');
-  new Product('Camel Chair', 'chair');
-  new Product('Cthulu Figurine', 'cthulhu');
-  new Product('Doggy Duck Bill', 'dog-duck');
-  new Product('Dragon Mean', 'dragon');
-  new Product('Pen Utensils', 'pen');
-  new Product('Pet Sweep', 'pet-sweep');
-  new Product('Pizza Scissors', 'scissors');
-  new Product('Stuffed Shark Toy', 'shark');
-  new Product('Baby Sweeper Onesie', 'sweep', 'png');
-  new Product('Tauntaun Blanket', 'tauntaun');
-  new Product('Unicorn Meat', 'unicorn');
-  new Product('Self-Watering Watering Can', 'water-can');
-  new Product('EZ Tip Wine Glass', 'wine-glass');
-}
-
-// Inclusive minimum, exclusive maximum. Algorithm from MDN Docs.
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min) + min);
-}
+Product.instantiateProducts = function() {
+  new Product('bag');
+  new Product('banana');
+  new Product('bathroom');
+  new Product('boots');
+  new Product('breakfast');
+  new Product('bubblegum');
+  new Product('chair');
+  new Product('cthulhu');
+  new Product('dog-duck');
+  new Product('dragon');
+  new Product('pen');
+  new Product('pet-sweep');
+  new Product('scissors');
+  new Product('shark');
+  new Product('sweep', 'png');
+  new Product('tauntaun');
+  new Product('unicorn');
+  new Product('water-can');
+  new Product('wine-glass');
+};
 
 Product.pickRandomUniques = function(numToPick) {
   let successes = 0;
@@ -114,7 +107,18 @@ Product.pickRandomUniques = function(numToPick) {
   return Product.inUseSet;
 };
 
+function capitalizeWords(string) {
+  let wordsArray = string.split('-');
+  wordsArray = wordsArray.map(word => `${word[0].toUpperCase()}${word.substring(1)}`);
+  return wordsArray.join(' ');
+}
 
+// Inclusive minimum, exclusive maximum. Algorithm from MDN Docs.
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min);
+}
 
 // Draws an image to a buttonElement using given productObject properties.
 function drawButton(buttonElement, productObject) {
@@ -158,7 +162,7 @@ function populateResults() {
 
     Product.instances.forEach(product => {
       const item = document.createElement('li');
-      item.innerText = `${product.fileName}: ${product.votes} / ${product.views} (${Math.round(product.getPercent() * 100)}%)`;
+      item.innerText = `${product.productName}: ${product.votes} / ${product.views} (${Math.round(product.getPercent() * 100)}%)`;
       cache.resultsList.append(item);
     });
   }
@@ -195,7 +199,7 @@ function renderBarChart() {
   return new Chart(cache.resultsChartCtx, {
     type: 'bar',
     data: {
-      labels: Product.instances.map(product => product.fileName),
+      labels: Product.instances.map(product => product.productName),
       datasets: [{
         label: '# of Views',
         data: Product.instances.map(product => product.views),
