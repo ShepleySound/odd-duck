@@ -11,7 +11,7 @@ const cache = {
 const flags = {
   resultsDisplayed: false,
   votingOver: false,
-}
+};
 
 const votingState = {
   endAfterRound: 25,
@@ -50,9 +50,9 @@ Product.pullFromStorage = function() {
   const storedProducts = JSON.parse(localStorage.getItem('productInstances'));
   if (storedProducts) {
     storedProducts.forEach(rawProduct => {
-      Product.createFromRawObject(rawProduct)
+      Product.createFromRawObject(rawProduct);
     });
-  } else {Product.instantiateProducts()}
+  } else {Product.instantiateProducts();}
 };
 
 Product.createFromRawObject = function(object) {
