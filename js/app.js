@@ -128,15 +128,12 @@ function handleVotingEnd() {
 function populateResults() {
   if (votingState.isResultDisplayable) {
     cache.resultsList.innerHTML = '';
-    cache.votingButtonSection.classList.add('hidden');
 
     Product.instances.forEach(product => {
       const item = document.createElement('li');
       item.innerText = `${product.fileName}: ${product.votes} / ${product.views} (${Math.round(product.getPercent() * 100)}%)`;
       cache.resultsList.append(item);
     });
-    cache.resultsOverlay.classList.add('visible');
-    buildBarChart();
   }
 }
 
@@ -153,7 +150,7 @@ function handleVoteSelection(event) {
   if (!votingState.isResultDisplayable()) {
     refreshVotingChoices(Product.instances);
     votingState.incrementRound();
-    cache.roundCount.innerText = `Round: ${votingState.round}`;
+    cache.roundCount.innerText = `${votingState.round} / ${votingState.endAfterRound}`;
   } else {
     handleVotingEnd();
     cache.roundCount.innerText = 'Voting Over';
@@ -165,6 +162,7 @@ function buildBarChart() {
   Chart.defaults.color = '#cccccc';
   // eslint-disable-next-line no-undef
   Chart.defaults.font.family = '"Roboto Mono", monospace',
+  // eslint-disable-next-line no-undef
   Chart.defaults.font.size = 14;
   // eslint-disable-next-line no-undef
   new Chart(cache.resultsChartCanvas, {
@@ -222,12 +220,24 @@ function buildBarChart() {
   });
 }
 
+function openResultsOverlay() {
+  populateResults();
+  cache.resultsOverlay.classList.remove('hidden');
+  cache.votingButtonSection.classList.add('hidden');
+  buildBarChart();
+}
+function closeResultsOverlay() {
+  cache.resultsOverlay.classList.add('hidden');
+  cache.votingButtonSection.classList.remove('hidden');
+}
+
 
 
 cache.votingButtonSection.addEventListener('click', handleVoteSelection);
 
-cache.showResultsBtn.addEventListener('click', populateResults);
+window.addEventListener('keydown', closeResultsOverlay);
+cache.showResultsBtn.addEventListener('click', openResultsOverlay);
 cache.showResultsBtn.style.display = 'none';
 cache.showResultsBtn.style.opacity = 0;
-cache.roundCount.innerText = `Round: ${votingState.round}`;
+cache.roundCount.innerText = `${votingState.round} / ${votingState.endAfterRound}`;
 refreshVotingChoices(Product.instances);

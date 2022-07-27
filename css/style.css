@@ -55,10 +55,13 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  height: 100%
 }
 
 .round-count {
   font-size: 1.5rem;
+  margin-bottom: 30px;
 }
 
 .voting-buttons {
@@ -74,12 +77,13 @@ main {
   border: none;
   border-radius: 10px;
   color: #cccccc;
+  user-select: none;
 }
 
 .product-button {
   /* box-sizing: border-box; */
-  width: 440px;
-  height: 440px;
+  width: 340px;
+  height: 340px;
   margin: 20px;
   padding: 20px;
   background-color: #5c8177a9;
@@ -99,8 +103,8 @@ main {
 .product-image {
   width: auto;
   height: auto;
-  max-height: 400px;
-  max-width: 400px;
+  max-height: 300px;
+  max-width: 300px;
   border-radius: 10px;
   object-fit: contain;
   animation: fade-in 200ms ease-in-out;
@@ -164,7 +168,7 @@ main {
   padding: .3em;
 }
 
-.results-overlay.visible {
+.results-overlay {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -197,7 +201,7 @@ footer {
 }
 
 @media screen and (max-width: 900px) {
-  .results-overlay.visible {
+  .results-overlay {
     flex-direction: column;
   }
 
