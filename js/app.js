@@ -6,11 +6,11 @@ const cache = {
   roundCount: document.querySelector('.round-count'),
   resultsOverlay: document.querySelector('.results-overlay'),
   resultsList: document.querySelector('.results-list'),
-  resultsChart: document.querySelector('results-chart')
+  resultsChartCanvas: document.querySelector('.results-chart').getContext('2d'),
 };
 
 const votingState = {
-  endAfterRound: 3,
+  endAfterRound: 25,
   round: 1,
   incrementRound() {
     this.round++;
@@ -35,7 +35,6 @@ function Product(productName, fileName, extension = 'jpg') {
   Product.instances.push(this);
 }
 Product.instances = [];
-Product.previousSet = [];
 Product.inUseSet = [];
 
 Product.prototype.getPercent = function() {
@@ -130,6 +129,7 @@ function handleVotingEnd() {
 function populateResults() {
   if (votingState.isResultDisplayable) {
     cache.resultsList.innerHTML = '';
+    cache.votingButtonSection.classList.add('hidden');
 
     Product.instances.forEach(product => {
       const item = document.createElement('li');
@@ -138,6 +138,61 @@ function populateResults() {
     });
     cache.resultsOverlay.classList.add('visible');
   }
+  Chart.defaults.color = '#cccccc';
+  Chart.defaults.font.size = 14
+  new Chart(cache.resultsChartCanvas, {
+    type: 'bar',
+    data: {
+      labels: Product.instances.map(product => product.fileName),
+      datasets: [{
+        label: '# of Views',
+        data: Product.instances.map(product => product.views),
+        backgroundColor: [
+          '#CACFB53f',
+          '#9FA9933f',
+          '#9DA9A13f',
+          '#BDB2A83f',
+          '#906A653f',
+        ],
+        borderWidth: 1
+      },
+      {
+        label: '# of Votes',
+        data: Product.instances.map(product => product.votes),
+        backgroundColor: [
+          '#D9E59D',
+          '#A2BD81',
+          '#94B49D',
+          '#D0B194',
+          '#B84D3F',
+        ],
+        borderColor: [
+          '#121212'
+        ],
+        borderWidth: 1
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          stacked: true,
+          ticks: {
+            font: {
+              size: 14
+            },
+            maxRotation: 90
+          }
+        },
+        y: {
+          ticks: {
+            precision: 0
+          },
+          stacked: false
+        }
+      }
+    },
+  });
 }
 
 function handleVoteSelection(event) {
@@ -159,6 +214,7 @@ function handleVoteSelection(event) {
     cache.roundCount.innerText = 'Voting Over';
   }
 }
+
 
 cache.votingButtonSection.addEventListener('click', handleVoteSelection);
 
