@@ -1,5 +1,7 @@
 'use strict';
 const cache = {
+  infoOverlay: document.querySelector('.info-overlay'),
+  showInfoBtn: document.querySelector('.info-button'),
   votingButtonSection: document.querySelector('.voting-buttons'),
   showResultsBtn: document.querySelector('.show-results-button'),
   roundCount: document.querySelector('.round-count'),
@@ -9,6 +11,7 @@ const cache = {
 };
 
 const flags = {
+  infoDisplayed: false,
   resultsDisplayed: false,
   votingOver: false,
 };
@@ -269,10 +272,27 @@ function closeResultsOverlay() {
   }
 }
 
+function openInfoOverlay() {
+  if (!flags.infoDisplayed) {
+    cache.infoOverlay.classList.remove('hidden');
+    flags.infoDisplayed = true;
+  }
+}
+
+function closeInfoOverlay() {
+  if (flags.infoDisplayed) {
+    cache.infoOverlay.classList.add('hidden');
+    flags.infoDisplayed = false;
+  }
+}
+
 cache.votingButtonSection.addEventListener('click', handleVoteSelection);
+cache.showResultsBtn.addEventListener('click', openResultsOverlay);
+cache.showInfoBtn.addEventListener('click', openInfoOverlay);
 
 window.addEventListener('keydown', closeResultsOverlay);
-cache.showResultsBtn.addEventListener('click', openResultsOverlay);
+window.addEventListener('keydown', closeInfoOverlay);
+cache.infoOverlay.addEventListener('click', closeInfoOverlay);
 cache.showResultsBtn.style.display = 'none';
 cache.showResultsBtn.style.opacity = 0;
 cache.roundCount.innerText = `${votingState.round} / ${votingState.endAfterRound}`;
