@@ -19,26 +19,28 @@
       <h1>Odd<br>Duck</h1>
     </a>
     <h2>Product Preference Survey</h2>
-    <div class="empty-spacer"></div>
+    <div class="info-button-container">
+      <button class="button info-button" type="button">?</button>
+    </div>
   </header>
   <main>
     <div class="round-count"></div>
     <section class="voting-buttons">
-      <button class="button product-button">
+      <button class="button product-button" type="button">
         <img src="" alt="" class="product-image" width="400">
       </button>
-      <button class="button product-button">
+      <button class="button product-button" type="button">
         <img src="" alt="" class="product-image" width="400">
       </button>
-      <button class="button product-button">
+      <button class="button product-button" type="button">
         <img src="" alt="" class="product-image" width="400">
       </button>
     </section>
-    <button class="button show-results-button">Show Results</button>
+    <button class="button show-results-button" type="button">Show Results</button>
 
   </main>
   <footer>Web Development Project by Robert Shepley &copy; 2022</footer>
-      <div class="results-overlay hidden">
+    <div class="overlay results-overlay hidden">
       <section class="results-list-area">
         <h2>Results</h2>
         <h3>Product: votes / views (%)</h3>
@@ -48,5 +50,17 @@
         <canvas class="results-chart"></canvas>
       </div>
     </div>
+    <div class="overlay info-overlay hidden">
+      <section class="info-area">
+        <h2>What is this?</h2>
+        <p class="info-paragraph">Welcome! As a valued member of the Odd Duck&trade; family, we'd like to invite you to provide your thoughts on our next big product.</p>
+        <p class="info-paragraph">It's easy. Just select your favorite items until you reach the end of the survey. Don't think too hard about it. Just trust your instincts! Your choices could help decide which of these fantastic products you'll see hit our shelves next year.*</p>
+        <p class="info-paragraph">Give it a go. No judgment involved!** And remember - "At Odd Duck, nobody's the odd one out!"</p>
+        <p class="fine-print">*The opinions expressed in this survey are your own, and do not reflect on Weird Swan Holdings LLC, Odd Duck Inc., or any subsidiaries. Future investments are decided using multiple factors. Employee opinions will not be considered if they are incorrect.</p>
+        <p class="fine-print">**Surveys taken on Odd Duck Inc. property are closely monitored. Employee choices may be laughed at by Todd*** (Todd works in Security).</p>
+        <p class="fine-print">***Also Craig (Craig works in IT. Hi Todd.)</p>
+      </section>
+    </div>
+
 </body>
 </html>

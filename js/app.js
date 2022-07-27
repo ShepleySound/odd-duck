@@ -1,11 +1,19 @@
 'use strict';
 const cache = {
+  infoOverlay: document.querySelector('.info-overlay'),
+  showInfoBtn: document.querySelector('.info-button'),
   votingButtonSection: document.querySelector('.voting-buttons'),
   showResultsBtn: document.querySelector('.show-results-button'),
   roundCount: document.querySelector('.round-count'),
   resultsOverlay: document.querySelector('.results-overlay'),
   resultsList: document.querySelector('.results-list'),
-  resultsChartCanvas: document.querySelector('.results-chart').getContext('2d'),
+  resultsChartCtx: document.querySelector('.results-chart').getContext('2d'),
+};
+
+const flags = {
+  infoDisplayed: false,
+  resultsDisplayed: false,
+  votingOver: false,
 };
 
 const votingState = {
@@ -24,17 +32,35 @@ const votingState = {
 };
 
 // Constructs a new Product given a name, filepath, and file extension.
-function Product(productName, fileName, extension = 'jpg') {
-  this.productName = productName;
+function Product(fileName, extension = 'jpg', votes = 0, views = 0) {
   this.fileName = fileName;
   this.extension = extension;
   this.path = `${this.fileName}.${this.extension}`;
-  this.votes = 0;
-  this.views = 0;
+  this.productName = capitalizeWords(this.fileName);
+  this.votes = votes;
+  this.views = views;
   Product.instances.push(this);
 }
+
 Product.instances = [];
 Product.inUseSet = [];
+
+Product.pushToStorage = function() {
+  localStorage.setItem('productInstances', JSON.stringify(Product.instances));
+};
+Product.pullFromStorage = function() {
+  Product.instances = [];
+  const storedProducts = JSON.parse(localStorage.getItem('productInstances'));
+  if (storedProducts) {
+    storedProducts.forEach(rawProduct => {
+      Product.createFromRawObject(rawProduct);
+    });
+  } else {Product.instantiateProducts();}
+};
+
+Product.createFromRawObject = function(object) {
+  return new Product(object.fileName, object.extension, object.votes, object.views);
+};
 
 Product.prototype.getPercent = function() {
   if (this.views === 0) {
@@ -43,32 +69,27 @@ Product.prototype.getPercent = function() {
   return this.votes / this.views;
 };
 
-new Product('R2D2 Luggage', 'bag');
-new Product('Banana Slicer', 'banana');
-new Product('Bathroom Tablet Stand', 'bathroom');
-new Product('Toeless Rain Boots', 'boots');
-new Product('All-in-one Breakfast Maker', 'breakfast');
-new Product('Meatball Bubble Gum', 'bubblegum');
-new Product('Camel Chair', 'chair');
-new Product('Cthulu Figurine', 'cthulhu');
-new Product('Doggy Duck Bill', 'dog-duck');
-new Product('Dragon Mean', 'dragon');
-new Product('Pen Utensils', 'pen');
-new Product('Pet Sweep', 'pet-sweep');
-new Product('Pizza Scissors', 'scissors');
-new Product('Stuffed Shark Toy', 'shark');
-new Product('Baby Sweeper Onesie', 'sweep', 'png');
-new Product('Tauntaun Blanket', 'tauntaun');
-new Product('Unicorn Meat', 'unicorn');
-new Product('Self-Watering Watering Can', 'water-can');
-new Product('EZ Tip Wine Glass', 'wine-glass');
-
-// Inclusive minimum, exclusive maximum. Algorithm from MDN Docs.
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min) + min);
-}
+Product.instantiateProducts = function() {
+  new Product('bag');
+  new Product('banana');
+  new Product('bathroom');
+  new Product('boots');
+  new Product('breakfast');
+  new Product('bubblegum');
+  new Product('chair');
+  new Product('cthulhu');
+  new Product('dog-duck');
+  new Product('dragon');
+  new Product('pen');
+  new Product('pet-sweep');
+  new Product('scissors');
+  new Product('shark');
+  new Product('sweep', 'png');
+  new Product('tauntaun');
+  new Product('unicorn');
+  new Product('water-can');
+  new Product('wine-glass');
+};
 
 Product.pickRandomUniques = function(numToPick) {
   let successes = 0;
@@ -88,6 +109,19 @@ Product.pickRandomUniques = function(numToPick) {
   Product.inUseSet.splice(numToPick);
   return Product.inUseSet;
 };
+
+function capitalizeWords(string) {
+  let wordsArray = string.split('-');
+  wordsArray = wordsArray.map(word => `${word[0].toUpperCase()}${word.substring(1)}`);
+  return wordsArray.join(' ');
+}
+
+// Inclusive minimum, exclusive maximum. Algorithm from MDN Docs.
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min);
+}
 
 // Draws an image to a buttonElement using given productObject properties.
 function drawButton(buttonElement, productObject) {
@@ -128,15 +162,12 @@ function handleVotingEnd() {
 function populateResults() {
   if (votingState.isResultDisplayable) {
     cache.resultsList.innerHTML = '';
-    cache.votingButtonSection.classList.add('hidden');
 
     Product.instances.forEach(product => {
       const item = document.createElement('li');
-      item.innerText = `${product.fileName}: ${product.votes} / ${product.views} (${Math.round(product.getPercent() * 100)}%)`;
+      item.innerText = `${product.productName}: ${product.votes} / ${product.views} (${Math.round(product.getPercent() * 100)}%)`;
       cache.resultsList.append(item);
     });
-    cache.resultsOverlay.classList.add('visible');
-    buildBarChart();
   }
 }
 
@@ -153,24 +184,25 @@ function handleVoteSelection(event) {
   if (!votingState.isResultDisplayable()) {
     refreshVotingChoices(Product.instances);
     votingState.incrementRound();
-    cache.roundCount.innerText = `Round: ${votingState.round}`;
+    cache.roundCount.innerText = `${votingState.round} / ${votingState.endAfterRound}`;
   } else {
     handleVotingEnd();
-    cache.roundCount.innerText = 'Voting Over';
   }
+  Product.pushToStorage();
 }
 
-function buildBarChart() {
+function renderBarChart() {
   // eslint-disable-next-line no-undef
   Chart.defaults.color = '#cccccc';
   // eslint-disable-next-line no-undef
   Chart.defaults.font.family = '"Roboto Mono", monospace',
+  // eslint-disable-next-line no-undef
   Chart.defaults.font.size = 14;
   // eslint-disable-next-line no-undef
-  new Chart(cache.resultsChartCanvas, {
+  return new Chart(cache.resultsChartCtx, {
     type: 'bar',
     data: {
-      labels: Product.instances.map(product => product.fileName),
+      labels: Product.instances.map(product => product.productName),
       datasets: [{
         label: '# of Views',
         data: Product.instances.map(product => product.views),
@@ -222,12 +254,47 @@ function buildBarChart() {
   });
 }
 
+function openResultsOverlay() {
+  if (!flags.resultsDisplayed) {
+    populateResults();
+    cache.resultsOverlay.classList.remove('hidden');
+    cache.votingButtonSection.classList.add('hidden');
+    cache.barChart = renderBarChart();
+    flags.resultsDisplayed = true;
+  }
+}
+function closeResultsOverlay() {
+  if (flags.resultsDisplayed) {
+    cache.barChart.destroy();
+    cache.resultsOverlay.classList.add('hidden');
+    cache.votingButtonSection.classList.remove('hidden');
+    flags.resultsDisplayed = false;
+  }
+}
 
+function openInfoOverlay() {
+  if (!flags.infoDisplayed) {
+    cache.infoOverlay.classList.remove('hidden');
+    flags.infoDisplayed = true;
+  }
+}
+
+function closeInfoOverlay() {
+  if (flags.infoDisplayed) {
+    cache.infoOverlay.classList.add('hidden');
+    flags.infoDisplayed = false;
+  }
+}
 
 cache.votingButtonSection.addEventListener('click', handleVoteSelection);
+cache.showResultsBtn.addEventListener('click', openResultsOverlay);
+cache.showInfoBtn.addEventListener('click', openInfoOverlay);
 
-cache.showResultsBtn.addEventListener('click', populateResults);
+window.addEventListener('keydown', closeResultsOverlay);
+window.addEventListener('keydown', closeInfoOverlay);
+cache.infoOverlay.addEventListener('click', closeInfoOverlay);
 cache.showResultsBtn.style.display = 'none';
 cache.showResultsBtn.style.opacity = 0;
-cache.roundCount.innerText = `Round: ${votingState.round}`;
+cache.roundCount.innerText = `${votingState.round} / ${votingState.endAfterRound}`;
+Product.pullFromStorage();
 refreshVotingChoices(Product.instances);
