@@ -5,8 +5,13 @@ const cache = {
   roundCount: document.querySelector('.round-count'),
   resultsOverlay: document.querySelector('.results-overlay'),
   resultsList: document.querySelector('.results-list'),
-  resultsChartCanvas: document.querySelector('.results-chart').getContext('2d'),
+  resultsChartCtx: document.querySelector('.results-chart').getContext('2d'),
 };
+
+const flags = {
+  resultsDisplayed: false,
+  votingOver: false,
+}
 
 const votingState = {
   endAfterRound: 25,
@@ -24,17 +29,35 @@ const votingState = {
 };
 
 // Constructs a new Product given a name, filepath, and file extension.
-function Product(productName, fileName, extension = 'jpg') {
+function Product(productName, fileName, extension = 'jpg', votes = 0, views = 0) {
   this.productName = productName;
   this.fileName = fileName;
   this.extension = extension;
   this.path = `${this.fileName}.${this.extension}`;
-  this.votes = 0;
-  this.views = 0;
+  this.votes = votes;
+  this.views = views;
   Product.instances.push(this);
 }
+
 Product.instances = [];
 Product.inUseSet = [];
+
+Product.pushToStorage = function() {
+  localStorage.setItem('productInstances', JSON.stringify(Product.instances));
+};
+Product.pullFromStorage = function() {
+  Product.instances = [];
+  const storedProducts = JSON.parse(localStorage.getItem('productInstances'));
+  if (storedProducts) {
+    storedProducts.forEach(rawProduct => {
+      Product.createFromRawObject(rawProduct)
+    });
+  }
+};
+
+Product.createFromRawObject = function(object) {
+  return new Product(object.productName, object.fileName, object.extension, object.votes, object.views);
+};
 
 Product.prototype.getPercent = function() {
   if (this.views === 0) {
@@ -43,25 +66,27 @@ Product.prototype.getPercent = function() {
   return this.votes / this.views;
 };
 
-new Product('R2D2 Luggage', 'bag');
-new Product('Banana Slicer', 'banana');
-new Product('Bathroom Tablet Stand', 'bathroom');
-new Product('Toeless Rain Boots', 'boots');
-new Product('All-in-one Breakfast Maker', 'breakfast');
-new Product('Meatball Bubble Gum', 'bubblegum');
-new Product('Camel Chair', 'chair');
-new Product('Cthulu Figurine', 'cthulhu');
-new Product('Doggy Duck Bill', 'dog-duck');
-new Product('Dragon Mean', 'dragon');
-new Product('Pen Utensils', 'pen');
-new Product('Pet Sweep', 'pet-sweep');
-new Product('Pizza Scissors', 'scissors');
-new Product('Stuffed Shark Toy', 'shark');
-new Product('Baby Sweeper Onesie', 'sweep', 'png');
-new Product('Tauntaun Blanket', 'tauntaun');
-new Product('Unicorn Meat', 'unicorn');
-new Product('Self-Watering Watering Can', 'water-can');
-new Product('EZ Tip Wine Glass', 'wine-glass');
+function instantiateProducts() {
+  new Product('R2D2 Luggage', 'bag');
+  new Product('Banana Slicer', 'banana');
+  new Product('Bathroom Tablet Stand', 'bathroom');
+  new Product('Toeless Rain Boots', 'boots');
+  new Product('All-in-one Breakfast Maker', 'breakfast');
+  new Product('Meatball Bubble Gum', 'bubblegum');
+  new Product('Camel Chair', 'chair');
+  new Product('Cthulu Figurine', 'cthulhu');
+  new Product('Doggy Duck Bill', 'dog-duck');
+  new Product('Dragon Mean', 'dragon');
+  new Product('Pen Utensils', 'pen');
+  new Product('Pet Sweep', 'pet-sweep');
+  new Product('Pizza Scissors', 'scissors');
+  new Product('Stuffed Shark Toy', 'shark');
+  new Product('Baby Sweeper Onesie', 'sweep', 'png');
+  new Product('Tauntaun Blanket', 'tauntaun');
+  new Product('Unicorn Meat', 'unicorn');
+  new Product('Self-Watering Watering Can', 'water-can');
+  new Product('EZ Tip Wine Glass', 'wine-glass');
+}
 
 // Inclusive minimum, exclusive maximum. Algorithm from MDN Docs.
 function getRandomInt(min, max) {
@@ -88,6 +113,8 @@ Product.pickRandomUniques = function(numToPick) {
   Product.inUseSet.splice(numToPick);
   return Product.inUseSet;
 };
+
+
 
 // Draws an image to a buttonElement using given productObject properties.
 function drawButton(buttonElement, productObject) {
@@ -153,11 +180,11 @@ function handleVoteSelection(event) {
     cache.roundCount.innerText = `${votingState.round} / ${votingState.endAfterRound}`;
   } else {
     handleVotingEnd();
-    cache.roundCount.innerText = 'Voting Over';
   }
+  Product.pushToStorage();
 }
 
-function buildBarChart() {
+function renderBarChart() {
   // eslint-disable-next-line no-undef
   Chart.defaults.color = '#cccccc';
   // eslint-disable-next-line no-undef
@@ -165,7 +192,7 @@ function buildBarChart() {
   // eslint-disable-next-line no-undef
   Chart.defaults.font.size = 14;
   // eslint-disable-next-line no-undef
-  new Chart(cache.resultsChartCanvas, {
+  return new Chart(cache.resultsChartCtx, {
     type: 'bar',
     data: {
       labels: Product.instances.map(product => product.fileName),
@@ -221,17 +248,22 @@ function buildBarChart() {
 }
 
 function openResultsOverlay() {
-  populateResults();
-  cache.resultsOverlay.classList.remove('hidden');
-  cache.votingButtonSection.classList.add('hidden');
-  buildBarChart();
+  if (!flags.resultsDisplayed) {
+    populateResults();
+    cache.resultsOverlay.classList.remove('hidden');
+    cache.votingButtonSection.classList.add('hidden');
+    cache.barChart = renderBarChart();
+    flags.resultsDisplayed = true;
+  }
 }
 function closeResultsOverlay() {
-  cache.resultsOverlay.classList.add('hidden');
-  cache.votingButtonSection.classList.remove('hidden');
+  if (flags.resultsDisplayed) {
+    cache.barChart.destroy();
+    cache.resultsOverlay.classList.add('hidden');
+    cache.votingButtonSection.classList.remove('hidden');
+    flags.resultsDisplayed = false;
+  }
 }
-
-
 
 cache.votingButtonSection.addEventListener('click', handleVoteSelection);
 
@@ -240,4 +272,5 @@ cache.showResultsBtn.addEventListener('click', openResultsOverlay);
 cache.showResultsBtn.style.display = 'none';
 cache.showResultsBtn.style.opacity = 0;
 cache.roundCount.innerText = `${votingState.round} / ${votingState.endAfterRound}`;
+Product.pullFromStorage();
 refreshVotingChoices(Product.instances);
